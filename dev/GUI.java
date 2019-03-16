@@ -99,7 +99,7 @@ public class GUI extends JFrame {
             int x = (int) (dimension.getWidth() / 2);
             int y = (int) (dimension.getHeight() / 2);
             Ellipse2D sun = new Ellipse2D.Double();
-            sun.setFrameFromCenter(x, y, x + 20, y + 20);
+            sun.setFrameFromCenter(x, y, x + 5, y + 5);
 
             g2d.setColor(Color.lightGray);
             g2d.setStroke(new BasicStroke(4.0f,
@@ -117,9 +117,36 @@ public class GUI extends JFrame {
                     BasicStroke.JOIN_ROUND));
 
             Ellipse2D mercuryOrbit = new Ellipse2D.Double();
-            mercuryOrbit.setFrameFromCenter(x, y, x + Formulas.mercOrbitRadius / 10e5, y + Formulas.mercOrbitRadius / 10e5);
-
+            mercuryOrbit.setFrameFromCenter(x, y, x + Formulas.mercAphelion / 3e6, y + Formulas.mercPerihelion / 8e6);
             g2d.draw(mercuryOrbit);
+
+            Ellipse2D marsOrbit = new Ellipse2D.Double();
+            marsOrbit.setFrameFromCenter(x, y, x + Formulas.marsAphelion / 3e6, y + Formulas.marsPerihelion / 8e6);
+            g2d.draw(marsOrbit);
+
+            Ellipse2D earthOrbit = new Ellipse2D.Double();
+            earthOrbit.setFrameFromCenter(x, y, x + Formulas.earthAphelion / 3e6, y + Formulas.earthPerihelion / 8e6);
+            g2d.draw(earthOrbit);
+
+            Ellipse2D venusOrbit = new Ellipse2D.Double();
+            venusOrbit.setFrameFromCenter(x, y, x + Formulas.venusAphelion / 3e6, y + Formulas.venusPerihelion / 8e6);
+            g2d.draw(venusOrbit);
+
+            Ellipse2D jupiterOrbit = new Ellipse2D.Double();
+            jupiterOrbit.setFrameFromCenter(x, y, x + Formulas.jupiterAphelion / 3e6, y + Formulas.jupiterPerihelion / 8e6);
+            g2d.draw(jupiterOrbit);
+
+            Ellipse2D saturnOrbit = new Ellipse2D.Double();
+            saturnOrbit.setFrameFromCenter(x, y, x + Formulas.saturnAphelion / 3e6, y + Formulas.saturnPerihelion / 8e6);
+            g2d.draw(saturnOrbit);
+
+            Ellipse2D uranusOrbit = new Ellipse2D.Double();
+            uranusOrbit.setFrameFromCenter(x, y, x + Formulas.uranusAphelion / 3e6, y + Formulas.uranusPerihelion / 8e6);
+            g2d.draw(uranusOrbit);
+
+            Ellipse2D neptuneOrbit = new Ellipse2D.Double();
+            neptuneOrbit.setFrameFromCenter(x, y, x + Formulas.neptuneAphelion / 3e6, y + Formulas.neptunePerihelion / 8e6);
+            g2d.draw(neptuneOrbit);
         }
     }
 }
