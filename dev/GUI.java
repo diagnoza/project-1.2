@@ -1,11 +1,19 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.Color;
+import java.awt.Graphics;
+
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+
 
 public class GUI extends JFrame {
+    JFrame frame = new JFrame("Solar System Simulation");;
 
     static {
         System.out.println("GUI initialized..");
@@ -56,7 +64,6 @@ public class GUI extends JFrame {
 
     /*Creates a frame for the solar system visualization*/
     public void init() {
-        JFrame frame = new JFrame("Solar System Simulation");
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
@@ -74,14 +81,35 @@ public class GUI extends JFrame {
         frame.setLocationRelativeTo(null);
         frame.pack();
         frame.setVisible(true);
-    }
-
-    public void paintPlanet() {
 
     }
 
-    class SolarSystem extends JPanel {
+    public void Planet() {
+        // add and draw the planets in order of String name, double mass, double radius, int height, int width, double distance, int x, int y, Color planetBorderColor, Color planetFillColor, JFrame space
+        //Planet mercury = new Planet(frame);
+    }
+
+    class SolarSystem extends JPanel implements MouseWheelListener, MouseListener, MouseMotionListener {
+
+        private double zoomFactor = 1;
+        private double prevZoomFactor = 1;
+        private boolean zoomer;
+        private boolean dragger;
+        private boolean released;
+        private double xOffset = 0;
+        private double yOffset = 0;
+        private int xDiff;
+        private int yDiff;
+        private Point startPoint;
+
+
         public SolarSystem() {
+            addMouseWheelListener(this);
+            addMouseMotionListener(this);
+            addMouseListener(this);
+
+
+
             setBackground(Color.black);
             setBorder(BorderFactory.createLineBorder(Color.red, 4));
         }
@@ -93,6 +121,38 @@ public class GUI extends JFrame {
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
 
+
+            if (zoomer) {
+                AffineTransform at = new AffineTransform();
+
+                double xRel = MouseInfo.getPointerInfo().getLocation().getX() - getLocationOnScreen().getX();
+                double yRel = MouseInfo.getPointerInfo().getLocation().getY() - getLocationOnScreen().getY();
+
+                double zoomDiv = zoomFactor / prevZoomFactor;
+
+                xOffset = (zoomDiv) * (xOffset) + (1 - zoomDiv) * xRel;
+                yOffset = (zoomDiv) * (yOffset) + (1 - zoomDiv) * yRel;
+
+                at.translate(xOffset, yOffset);
+                at.scale(zoomFactor, zoomFactor);
+                prevZoomFactor = zoomFactor;
+                g2d.transform(at);
+                zoomer = false;
+            }
+
+            if (dragger) {
+                AffineTransform at = new AffineTransform();
+                at.translate(xOffset + xDiff, yOffset + yDiff);
+                at.scale(zoomFactor, zoomFactor);
+                g2d.transform(at);
+
+                if (released) {
+                    xOffset += xDiff;
+                    yOffset += yDiff;
+                    dragger = false;
+                }
+
+            }
 
             /*Get the center of the screen - this is where Sun will be placed*/
             Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
@@ -147,6 +207,69 @@ public class GUI extends JFrame {
             Ellipse2D neptuneOrbit = new Ellipse2D.Double();
             neptuneOrbit.setFrameFromCenter(x, y, x + Formulas.neptuneAphelion / 3e6, y + Formulas.neptunePerihelion / 8e6);
             g2d.draw(neptuneOrbit);
+
+            //Planet mercury = new Planet(frame);
+
         }
+
+        @Override
+        public void mouseWheelMoved(MouseWheelEvent e) {
+
+            zoomer = true;
+
+            //Zoom in
+            if (e.getWheelRotation() < 0) {
+                zoomFactor *= 1.1;
+                repaint();
+            }
+            //Zoom out
+            if (e.getWheelRotation() > 0) {
+                zoomFactor /= 1.1;
+                repaint();
+            }
+        }
+
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            Point curPoint = e.getLocationOnScreen();
+            xDiff = curPoint.x - startPoint.x;
+            yDiff = curPoint.y - startPoint.y;
+
+            dragger = true;
+            repaint();
+
+        }
+
+        @Override
+        public void mouseMoved(MouseEvent e) {
+        }
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            released = false;
+            startPoint = MouseInfo.getPointerInfo().getLocation();
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            released = true;
+            repaint();
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+
+        }
+
     }
 }
