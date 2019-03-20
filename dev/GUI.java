@@ -3,22 +3,17 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
-import java.awt.Color;
-import java.awt.Graphics;
-
-import javax.swing.JFrame;
 
 
 public class GUI extends JFrame {
 
-    JFrame solarSimFrame = new JFrame("Solar System Simulation");
-    SolarSystem solarSimPanel;
-
-
-
     static {
         System.out.println("GUI initialized..");
     }
+
+    JFrame solarSimFrame = new JFrame("Solar System Simulation");
+    SolarSystem solarSimPanel;
+    ControlsButtonsPanel buttonPanel;
 
     public GUI() {
         setTitle("Main Menu");
@@ -90,9 +85,10 @@ public class GUI extends JFrame {
         solarSimPanel = new SolarSystem();
         solarSimFrame.add(solarSimPanel, gbc);
 
-        gbc.weightx = 0.1;
+
+        gbc.weightx = 0.01;
         gbc.gridx = 1;
-        JPanel buttonPanel = new ControlsButtonsPanel();
+        buttonPanel = new ControlsButtonsPanel();
         solarSimFrame.add(buttonPanel, gbc);
 
 
@@ -107,7 +103,14 @@ public class GUI extends JFrame {
         //Planet mercury = new Planet(solarSimFrame);
     }
 
+    public void drawCenteredCircle(Graphics2D g, int x, int y, int r) {
+        x = x - (r / 2);
+        y = y - (r / 2);
+        g.fillOval(x, y, r, r);
+    }
+
     class SolarSystem extends JPanel implements MouseWheelListener, MouseListener, MouseMotionListener {
+        Graphics2D g2d;
         private double zoomFactor = 1;
         private double prevZoomFactor = 1;
         private boolean zoomer;
@@ -118,9 +121,6 @@ public class GUI extends JFrame {
         private int xDiff;
         private int yDiff;
         private Point startPoint;
-
-
-        Graphics2D g2d;
 
 
         public SolarSystem() {
@@ -137,7 +137,6 @@ public class GUI extends JFrame {
             g2d = (Graphics2D) g;
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
-
 
 
             if (zoomer) {
@@ -188,7 +187,7 @@ public class GUI extends JFrame {
                     BasicStroke.JOIN_ROUND));
 
             g2d.draw(sun);
-            GradientPaint orangeToWhite = new GradientPaint(0,0,Color.orange,70, 0,Color.white, true);
+            GradientPaint orangeToWhite = new GradientPaint(0, 0, Color.orange, 70, 0, Color.white, true);
             g2d.setPaint(orangeToWhite);
             g2d.fill(sun);
 
@@ -302,28 +301,35 @@ public class GUI extends JFrame {
 
         }
 
-        public void setZoomer(boolean x) { zoomer = x; }
-        public void setDragger(boolean x) { dragger = x; }
+        public void setZoomer(boolean x) {
+            zoomer = x;
+        }
+
+        public void setDragger(boolean x) {
+            dragger = x;
+        }
 
     }
 
     class ControlsButtonsPanel extends JPanel {
+        private Thread t;
+        private boolean initialized = false;
 
         public ControlsButtonsPanel() {
+
             setBackground(Color.black);
             setBorder(BorderFactory.createLineBorder(Color.red));
-            add(Box.createRigidArea(new Dimension(0, 70)));
+            setPreferredSize(new Dimension(300, 50));
 
             JButton button1 = new JButton("<<");
             button1.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     /*call whatever method does all the calculations
-                    * example: Celestial.doCalculations(>desired time step<)*/
+                     * example: Celestial.doCalculations(>desired time step<)*/
 
                     solarSimFrame.repaint();
                     solarSimPanel.setZoomer(true);
-
 
 
                 }
@@ -331,7 +337,6 @@ public class GUI extends JFrame {
             button1.setPreferredSize(new Dimension(70, 30));
             button1.setAlignmentX(Component.CENTER_ALIGNMENT);
             button1.setFocusable(false);
-
 
             JButton button2 = new JButton(">>");
             button2.addActionListener(new ActionListener() {
@@ -348,17 +353,53 @@ public class GUI extends JFrame {
             button2.setFocusable(false);
 
 
+            JButton startSim = new JButton("Start");
+            startSim.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+
+
+                    t = new Thread(new Runnable() {
+                        public void run() {
+
+                            initialized = true;
+                            while (initialized) {
+                                /*call whatever method does all the calculations
+                                 * example: Celestial.doCalculations(>desired time step<)*/
+                                solarSimPanel.repaint();
+                                solarSimPanel.setZoomer(true);
+
+                            }
+                        }
+                    });
+
+                    t.start();
+
+                }
+            });
+            startSim.setPreferredSize(new Dimension(70, 30));
+            startSim.setAlignmentX(Component.CENTER_ALIGNMENT);
+            startSim.setFocusable(false);
+
+
+            JButton stopSim = new JButton("Stop");
+            stopSim.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    initialized = false;
+                }
+            });
+            stopSim.setPreferredSize(new Dimension(70, 30));
+            stopSim.setAlignmentX(Component.CENTER_ALIGNMENT);
+            stopSim.setFocusable(false);
+
+            add(startSim);
+            add(stopSim);
             add(button1);
             add(button2);
-            add(Box.createRigidArea(new Dimension(0, 20)));
+
         }
 
-    }
-
-    public void drawCenteredCircle(Graphics2D g, int x, int y, int r) {
-        x = x-(r/2);
-        y = y-(r/2);
-        g.fillOval(x,y,r,r);
     }
 
 }
