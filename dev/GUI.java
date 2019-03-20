@@ -3,17 +3,18 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.Color;
 import java.awt.Graphics;
 
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 
 public class GUI extends JFrame {
-    JFrame frame = new JFrame("Solar System Simulation");;
+
+    JFrame solarSimFrame = new JFrame("Solar System Simulation");
+    SolarSystem solarSimPanel;
+
+
 
     static {
         System.out.println("GUI initialized..");
@@ -42,6 +43,7 @@ public class GUI extends JFrame {
             }
         });
         initButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        initButton.setFocusable(false);
         panel.add(initButton);
         panel.add(Box.createRigidArea(new Dimension(0, 20)));
 
@@ -55,6 +57,7 @@ public class GUI extends JFrame {
             }
         });
         exitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        exitButton.setFocusable(false);
         panel.add(exitButton);
 
 
@@ -62,10 +65,10 @@ public class GUI extends JFrame {
         setVisible(true);
     }
 
-    /*Creates a frame for the solar system visualization*/
+    /*Creates a solarSimFrame for the solar system visualization*/
     public void init() {
-        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        frame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        solarSimFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        solarSimFrame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         WindowListener exitListener = new WindowAdapter() {
 
@@ -74,23 +77,37 @@ public class GUI extends JFrame {
                 new GUI();
             }
         };
-        frame.addWindowListener(exitListener);
+        solarSimFrame.addWindowListener(exitListener);
 
-        JPanel panel = new SolarSystem();
-        frame.add(panel);
-        frame.setLocationRelativeTo(null);
-        frame.pack();
-        frame.setVisible(true);
+        solarSimFrame.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.FIRST_LINE_START;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 0.9;
+        gbc.weighty = 1.0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        solarSimPanel = new SolarSystem();
+        solarSimFrame.add(solarSimPanel, gbc);
+
+        gbc.weightx = 0.1;
+        gbc.gridx = 1;
+        JPanel buttonPanel = new ControlsButtonsPanel();
+        solarSimFrame.add(buttonPanel, gbc);
+
+
+        solarSimFrame.setLocationRelativeTo(null);
+        solarSimFrame.pack();
+        solarSimFrame.setVisible(true);
 
     }
 
     public void Planet() {
         // add and draw the planets in order of String name, double mass, double radius, int height, int width, double distance, int x, int y, Color planetBorderColor, Color planetFillColor, JFrame space
-        //Planet mercury = new Planet(frame);
+        //Planet mercury = new Planet(solarSimFrame);
     }
 
     class SolarSystem extends JPanel implements MouseWheelListener, MouseListener, MouseMotionListener {
-
         private double zoomFactor = 1;
         private double prevZoomFactor = 1;
         private boolean zoomer;
@@ -103,26 +120,28 @@ public class GUI extends JFrame {
         private Point startPoint;
 
 
+        Graphics2D g2d;
+
+
         public SolarSystem() {
             addMouseWheelListener(this);
             addMouseMotionListener(this);
             addMouseListener(this);
 
-
-
             setBackground(Color.black);
-            setBorder(BorderFactory.createLineBorder(Color.red, 4));
         }
 
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            Graphics2D g2d = (Graphics2D) g;
+            g2d = (Graphics2D) g;
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
 
 
+
             if (zoomer) {
+
                 AffineTransform at = new AffineTransform();
 
                 double xRel = MouseInfo.getPointerInfo().getLocation().getX() - getLocationOnScreen().getX();
@@ -138,9 +157,11 @@ public class GUI extends JFrame {
                 prevZoomFactor = zoomFactor;
                 g2d.transform(at);
                 zoomer = false;
+
             }
 
             if (dragger) {
+
                 AffineTransform at = new AffineTransform();
                 at.translate(xOffset + xDiff, yOffset + yDiff);
                 at.scale(zoomFactor, zoomFactor);
@@ -179,6 +200,17 @@ public class GUI extends JFrame {
             Ellipse2D mercuryOrbit = new Ellipse2D.Double();
             mercuryOrbit.setFrameFromCenter(x, y, x + Formulas.mercAphelion / 3e6, y + Formulas.mercPerihelion / 8e6);
             g2d.draw(mercuryOrbit);
+            drawCenteredCircle(g2d, 100, 150, 50);
+            /*
+            drawCenteredCircle(Graphics2D, x, y, r) draws a filled circle, where (x,y) is
+            the circle's center. Replace x and y with coordinates from each planet's corresponding object.
+            Say we have:
+             Planet mercury = new Planet()
+            Then:
+             drawCenteredCircle(g2d, mercury.getX, mercury.getY, 30)
+
+            Both X and Y coordinates are supposed to be calculated beforehand in Celestial.java.
+             */
 
             Ellipse2D marsOrbit = new Ellipse2D.Double();
             marsOrbit.setFrameFromCenter(x, y, x + Formulas.marsAphelion / 3e6, y + Formulas.marsPerihelion / 8e6);
@@ -208,7 +240,6 @@ public class GUI extends JFrame {
             neptuneOrbit.setFrameFromCenter(x, y, x + Formulas.neptuneAphelion / 3e6, y + Formulas.neptunePerihelion / 8e6);
             g2d.draw(neptuneOrbit);
 
-            //Planet mercury = new Planet(frame);
 
         }
 
@@ -271,5 +302,63 @@ public class GUI extends JFrame {
 
         }
 
+        public void setZoomer(boolean x) { zoomer = x; }
+        public void setDragger(boolean x) { dragger = x; }
+
     }
+
+    class ControlsButtonsPanel extends JPanel {
+
+        public ControlsButtonsPanel() {
+            setBackground(Color.black);
+            setBorder(BorderFactory.createLineBorder(Color.red));
+            add(Box.createRigidArea(new Dimension(0, 70)));
+
+            JButton button1 = new JButton("<<");
+            button1.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    /*call whatever method does all the calculations
+                    * example: Celestial.doCalculations(>desired time step<)*/
+
+                    solarSimFrame.repaint();
+                    solarSimPanel.setZoomer(true);
+
+
+
+                }
+            });
+            button1.setPreferredSize(new Dimension(70, 30));
+            button1.setAlignmentX(Component.CENTER_ALIGNMENT);
+            button1.setFocusable(false);
+
+
+            JButton button2 = new JButton(">>");
+            button2.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    /*call whatever method does all the calculations
+                     * example: Celestial.doCalculations(>desired time step<)*/
+                    solarSimFrame.repaint();
+                    solarSimPanel.setZoomer(true);
+                }
+            });
+            button2.setPreferredSize(new Dimension(70, 30));
+            button2.setAlignmentX(Component.CENTER_ALIGNMENT);
+            button2.setFocusable(false);
+
+
+            add(button1);
+            add(button2);
+            add(Box.createRigidArea(new Dimension(0, 20)));
+        }
+
+    }
+
+    public void drawCenteredCircle(Graphics2D g, int x, int y, int r) {
+        x = x-(r/2);
+        y = y-(r/2);
+        g.fillOval(x,y,r,r);
+    }
+
 }
