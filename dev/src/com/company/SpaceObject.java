@@ -1,6 +1,7 @@
 package com.company;
 
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class SpaceObject {
     private double mass;
     private int radius;
     private BufferedImage img;
+    private Rectangle area;
 
     public SpaceObject() {
     }
@@ -110,4 +112,10 @@ public class SpaceObject {
     public BufferedImage getImg() {
         return this.img;
     }
+    public void setArea(Rectangle area) {
+        this.area = area;
+    }
+    public Rectangle getArea() { return area; }
+
+    public Vector3D getVel() { return vel; }
 }

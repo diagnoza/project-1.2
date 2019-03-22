@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -16,8 +17,15 @@ public class GUI extends JFrame {
 
     private Universe universe;
     private JFrame solarSimFrame = new JFrame("Solar System Simulation");
+    private JPanel info;
     private SolarSystem solarSimPanel;
     private ControlsButtonsPanel buttonPanel;
+
+    private JLabel planetName = new JLabel();
+    private JLabel planetPosition = new JLabel();
+    private JLabel planetVelocity = new JLabel();
+    private JLabel planetMass = new JLabel();
+    private JLabel planetRadius = new JLabel();
 
     public GUI(Universe universe) {
 
@@ -124,6 +132,9 @@ public class GUI extends JFrame {
         private int xDiff;
         private int yDiff;
         private Point startPoint;
+        private Point pointerPos;
+        private Rectangle rect;
+
 
 
         public SolarSystem() throws IOException {
@@ -158,6 +169,7 @@ public class GUI extends JFrame {
                 at.scale(zoomFactor, zoomFactor);
                 prevZoomFactor = zoomFactor;
                 g2d.transform(at);
+
                 zoomer = false;
 
             }
@@ -190,9 +202,18 @@ public class GUI extends JFrame {
                     */
 
 
-            for (SpaceObject so : universe.spaceObjects)
+            for (SpaceObject so : universe.spaceObjects) {
                 drawCenteredCircle(g2d, so.getPos().getX(), so.getPos().getY(), so.getRadius(), so.getImg());
 
+                Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+                int factorX = (int) ((int)so.getPos().getX() / 6E+7) + (int) (dimension.getWidth() / 2) - (so.getRadius() / 2);
+                int factorY = (-1) * (int) ((int)so.getPos().getY() / 6E+7) + (int) (dimension.getHeight() * 2) - (so.getRadius() * 2);
+
+
+                so.setArea(new Rectangle(factorX, factorY,so.getRadius(), so.getRadius()));
+
+                //rect = null;
+            }
 
             //Both X and Y coordinates are supposed to be calculated beforehand in Celestial.java.
             // */
@@ -228,6 +249,17 @@ public class GUI extends JFrame {
 
         @Override
         public void mouseMoved(MouseEvent e) {
+            for (SpaceObject so : universe.spaceObjects){
+                if (so.getArea().contains(e.getLocationOnScreen())){
+                    planetName.setText("<html><font color='red'><font size=\\\"3\\\">Name: " + so.getName());
+                    planetPosition.setText("<html><font color='red'><font size=\\\"3\\\">Position: " + so.getPos().getX() + ", " + so.getPos().getY());
+                    planetMass.setText("<html><font color='red'><font size=\\\"3\\\">Mass: " + so.getMass());
+                    planetVelocity.setText("<html><font color='red'><font size=\\\"3\\\">Velocity: " + so.getVel().getX() + ", " + so.getVel().getY());
+                    planetRadius.setText("<html><font color='red'><font size=\\\"3\\\">Radius: " + so.getRadius());
+
+                }
+                //else planetName.setText("");
+            }
         }
 
         @Override
@@ -273,6 +305,7 @@ public class GUI extends JFrame {
 
             //g.fillOval(factorX, factorY, r, r);
             g.drawImage(img, factorX, factorY, r, r, this);
+
         }
 
     }
@@ -335,9 +368,19 @@ public class GUI extends JFrame {
                                 /*call whatever method does all the calculations
                                  * example: Celestial.doCalculations(>desired time step<)*/
 
+
+
                                 universe.doStep();
                                 solarSimPanel.repaint();
+
+                                //planetName.setText("<html><font color='red'><font size=\"3\">Name: </font></html>");
+                                //planetPosition.setText("<html><font color='red'><font size=\"3\">Position: </font></html>");
+                                //planetVelocity.setText("<html><font color='red'><font size=\"3\">Velocity: </font></html>");
+                                //planetMass.setText("<html><font color='red'><font size=\"3\">Mass: </font></html>");
+                                //planetRadius.setText("<html><font color='red'><font size=\"3\">Radius: </font></html>");
+
                                 solarSimPanel.setZoomer(true);
+                                solarSimPanel.setDragger(false);
                             }
                         }
                     });
@@ -362,10 +405,27 @@ public class GUI extends JFrame {
             stopSim.setAlignmentX(Component.CENTER_ALIGNMENT);
             stopSim.setFocusable(false);
 
+
+            info = new JPanel();
+            info.setLayout(new BoxLayout(info, BoxLayout.PAGE_AXIS));
+            info.setBackground(Color.black);
+            info.setPreferredSize(new Dimension(300, 923));
+            info.setBorder(BorderFactory.createLineBorder(Color.red));
+
+            info.add(planetName);
+            info.add(planetPosition);
+            info.add(planetVelocity);
+            info.add(planetMass);
+            info.add(planetRadius);
+
+
             add(startSim);
             add(stopSim);
             add(button1);
             add(button2);
+            add(Box.createRigidArea(new Dimension(230,20)));
+            add(new JLabel("<html><font color='red'><font size=\"5\">Info and stats:</font></html>"));
+            add(info);
 
         }
 
