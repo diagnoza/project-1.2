@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<Pane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" style="-fx-background-color: seashell   ;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.company.GUI">
+   <children>
+      <LineChart fx:id="chart" layoutX="14.0" layoutY="14.0" prefHeight="487.0" prefWidth="620.0" style="-fx-background-color: seashell;">
+        <xAxis>
+          <NumberAxis side="BOTTOM" fx:id="xAxis" />
+        </xAxis>
+        <yAxis>
+          <NumberAxis fx:id="yAxis" side="LEFT" />
+        </yAxis>
+      </LineChart>
+      <LineChart fx:id="chart1" layoutX="14.0" layoutY="522.0" prefHeight="487.0" prefWidth="620.0" style="-fx-background-color: seashell;">
+         <xAxis>
+            <NumberAxis side="BOTTOM" fx:id="xAxis1" />
+         </xAxis>
+         <yAxis>
+            <NumberAxis fx:id="yAxis1" side="LEFT" />
+         </yAxis>
+      </LineChart>
+      <LineChart fx:id="chart2" layoutX="1286.0" layoutY="522.0" prefHeight="487.0" prefWidth="620.0" style="-fx-background-color: seashell;">
+         <xAxis>
+            <NumberAxis side="BOTTOM" fx:id="xAxis2" />
+         </xAxis>
+         <yAxis>
+            <NumberAxis fx:id="yAxis2" side="LEFT" />
+         </yAxis>
+      </LineChart>
+      <LineChart fx:id="chart3" layoutX="650.0" layoutY="522.0" prefHeight="487.0" prefWidth="620.0" style="-fx-background-color: seashell;">
+         <xAxis>
+            <NumberAxis side="BOTTOM" fx:id="xAxis3" />
+         </xAxis>
+         <yAxis>
+            <NumberAxis fx:id="yAxis3" side="LEFT" />
+         </yAxis>
+      </LineChart>
+      <LineChart fx:id="chart4" layoutX="1286.0" layoutY="14.0" prefHeight="487.0" prefWidth="620.0" style="-fx-background-color: seashell;">
+         <xAxis>
+            <NumberAxis side="BOTTOM" fx:id="xAxis4" />
+         </xAxis>
+         <yAxis>
+            <NumberAxis fx:id="yAxis4" side="LEFT" />
+         </yAxis>
+      </LineChart>
+      <LineChart fx:id="chart5" layoutX="650.0" layoutY="14.0" prefHeight="487.0" prefWidth="620.0" style="-fx-background-color: seashell;">
+         <xAxis>
+            <NumberAxis side="BOTTOM" fx:id="xAxis5" />
+         </xAxis>
+         <yAxis>
+            <NumberAxis fx:id="yAxis5" side="LEFT" />
+         </yAxis>
+      </LineChart>
+   </children>
+</Pane>

@@ -1,0 +1,4 @@
+* The lander is in 2D as per red booklet. What if we want to use drag to slow down.. What
+  coordinate system do we use? What if we go around titan?
+
+* We assume g is constant, so how far off the surface are we?
